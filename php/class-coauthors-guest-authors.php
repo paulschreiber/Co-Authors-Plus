@@ -186,7 +186,7 @@ class CoAuthors_Guest_Authors
 			return;
 		}
 
-		if ( ! wp_verify_nonce( $_GET['nonce'], 'create-guest-author' ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['nonce'] ) ), 'create-guest-author' ) ) {
 			wp_die( __( "Doin' something fishy, huh?", 'co-authors-plus' ) );
 		}
 
@@ -223,7 +223,7 @@ class CoAuthors_Guest_Authors
 		}
 
 		// Verify the user is who they say they are
-		if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'delete-guest-author' ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'delete-guest-author' ) ) {
 			wp_die( __( "Doin' something fishy, huh?", 'co-authors-plus' ) );
 		}
 
@@ -247,7 +247,7 @@ class CoAuthors_Guest_Authors
 				break;
 			// Reassign to a different user
 			case 'reassign-another':
-				$user_nicename = sanitize_title( $_POST['leave-assigned-to'] );
+				$user_nicename = sanitize_title( wp_unslash( $_POST['leave-assigned-to'] ) );
 				$reassign_to = $coauthors_plus->get_coauthor_by( 'user_nicename', $user_nicename );
 				if ( ! $reassign_to ) {
 					wp_die( __( 'Co-author does not exists. Try again?', 'co-authors-plus' ) );
@@ -292,7 +292,7 @@ class CoAuthors_Guest_Authors
 			die();
 		}
 
-		$search = sanitize_text_field( $_GET['q'] );
+		$search = sanitize_text_field( wp_unslash( $_GET['q'] ) );
 		if ( ! empty( $_GET['guest_author'] ) ) {
 			$ignore = array( $this->get_guest_author_by( 'ID', (int) $_GET['guest_author'] )->user_login );
 		} else {
@@ -452,7 +452,7 @@ class CoAuthors_Guest_Authors
 		// Allow guest authors to be deleted
 		if ( isset( $_GET['action'], $_GET['id'], $_GET['_wpnonce'] ) && 'delete' == $_GET['action'] ) {
 			// Make sure the user is who they say they are
-			if ( ! wp_verify_nonce( $_GET['_wpnonce'], 'guest-author-delete' ) ) {
+			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'guest-author-delete' ) ) {
 				wp_die( __( "Doin' something fishy, huh?", 'co-authors-plus' ) );
 			}
 
@@ -697,7 +697,7 @@ class CoAuthors_Guest_Authors
 		}
 
 		// @todo caps check
-		if ( ! isset( $_POST['guest-author-nonce'] ) || ! wp_verify_nonce( $_POST['guest-author-nonce'], 'guest-author-nonce' ) ) {
+		if ( ! isset( $_POST['guest-author-nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['guest-author-nonce'] ) ), 'guest-author-nonce' ) ) {
 			return $post_data;
 		}
 
@@ -705,11 +705,11 @@ class CoAuthors_Guest_Authors
 		if ( empty( $_POST['cap-display_name'] ) ) {
 			wp_die( __( 'Guest authors cannot be created without display names.', 'co-authors-plus' ) );
 		}
-		$post_data['post_title'] = sanitize_text_field( $_POST['cap-display_name'] );
+		$post_data['post_title'] = sanitize_text_field( wp_unslash( $_POST['cap-display_name'] ) );
 
 		$slug = sanitize_title( get_post_meta( $original_args['ID'], $this->get_post_meta_key( 'user_login' ), true ) );
 		if ( ! $slug ) {
-			$slug = sanitize_title( $_POST['cap-display_name'] );
+			$slug = sanitize_title( wp_unslash( $_POST['cap-display_name'] ) );
 		}
 
 		// Uh oh, no guest authors without slugs
@@ -749,7 +749,7 @@ class CoAuthors_Guest_Authors
 		}
 
 		// @todo caps check
-		if ( ! isset( $_POST['guest-author-nonce'] ) || ! wp_verify_nonce( $_POST['guest-author-nonce'], 'guest-author-nonce' ) ) {
+		if ( ! isset( $_POST['guest-author-nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['guest-author-nonce'] ) ), 'guest-author-nonce' ) ) {
 			return;
 		}
 
@@ -761,7 +761,7 @@ class CoAuthors_Guest_Authors
 			// 'user_login' should only be saved on post update if it doesn't exist
 			if ( 'user_login' == $author_field['key'] && ! get_post_meta( $post_id, $key, true ) ) {
 				$display_name_key = $this->get_post_meta_key( 'display_name' );
-				$temp_slug = sanitize_title( $_POST[ $display_name_key ] );
+				$temp_slug = sanitize_title( wp_unslash( $_POST[ $display_name_key ] ) );
 				update_post_meta( $post_id, $key, $temp_slug );
 				continue;
 			}
@@ -791,9 +791,9 @@ class CoAuthors_Guest_Authors
 			}
 
 			if ( isset( $author_field['sanitize_function'] ) && is_callable( $author_field['sanitize_function'] ) ) {
-				$value = call_user_func( $author_field['sanitize_function'], $_POST[ $key ] );
+				$value = call_user_func( $author_field['sanitize_function'], wp_unslash( $_POST[ $key ] ) );
 			} else {
-				$value = sanitize_text_field( $_POST[ $key ] );
+				$value = sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
 			}
 			update_post_meta( $post_id, $key, $value );
 		}

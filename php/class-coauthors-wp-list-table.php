@@ -72,12 +72,12 @@ class CoAuthors_WP_List_Table extends WP_List_Table {
 				case 'first_name':
 				case 'last_name':
 					$args['orderby'] = 'meta_value';
-					$args['meta_key'] = $coauthors_plus->guest_authors->get_post_meta_key( $_REQUEST['orderby'] );
+					$args['meta_key'] = $coauthors_plus->guest_authors->get_post_meta_key( sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ) );
 					break;
 			}
 		}
-		if ( isset( $_REQUEST['order'] ) && in_array( strtoupper( $_REQUEST['order'] ), array( 'ASC', 'DESC' ) ) ) {
-			$args['order'] = strtoupper( $_REQUEST['order'] );
+		if ( isset( $_REQUEST['order'] ) && in_array( strtoupper( sanitize_text_field( wp_unslash( $_REQUEST['order'] ) ) ), array( 'ASC', 'DESC' ) ) ) {
+			$args['order'] = strtoupper( sanitize_text_field( wp_unslash( $_REQUEST['order'] ) ) );
 		}
 
 		$this->filters = array(
@@ -86,7 +86,7 @@ class CoAuthors_WP_List_Table extends WP_List_Table {
 				'without-linked-account'  => __( 'Without linked account', 'co-authors-plus' ),
 			);
 
-		if ( isset( $_REQUEST['filter'] ) && array_key_exists( $_REQUEST['filter'], $this->filters ) ) {
+		if ( isset( $_REQUEST['filter'] ) && array_key_exists( sanitize_text_field( wp_unslash( $_REQUEST['filter'] ) ), $this->filters ) ) {
 			$this->active_filter = sanitize_key( $_REQUEST['filter'] );
 		} else {
 			$this->active_filter = 'show-all';
@@ -129,7 +129,7 @@ class CoAuthors_WP_List_Table extends WP_List_Table {
 
 	function filter_query_for_search( $where ) {
 		global $wpdb;
-		$var = '%' . sanitize_text_field( $_REQUEST['s'] ) . '%';
+		$var = '%' . sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) . '%';
 		$where .= $wpdb->prepare( ' AND (post_title LIKE %s OR post_name LIKE %s )', $var, $var );
 		return $where;
 	}

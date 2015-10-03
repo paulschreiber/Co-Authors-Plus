@@ -726,7 +726,7 @@ class coauthors_plus {
 
 		// This action happens when a post is saved while editing a post
 		if ( isset( $_REQUEST['coauthors-nonce'] ) && isset( $_POST['coauthors'] ) && is_array( $_POST['coauthors'] ) ) {
-			$author = sanitize_text_field( $_POST['coauthors'][0] );
+			$author = sanitize_text_field( wp_unslash( $_POST['coauthors'][0] ) );
 			if ( $author ) {
 				$author_data = $this->get_coauthor_by( 'user_nicename', $author );
 				// If it's a guest author and has a linked account, store that information in post_author
@@ -771,7 +771,7 @@ class coauthors_plus {
 			if ( isset( $_POST['coauthors-nonce'] ) && isset( $_POST['coauthors'] ) ) {
 				check_admin_referer( 'coauthors-edit', 'coauthors-nonce' );
 
-				$coauthors = (array) $_POST['coauthors'];
+				$coauthors = (array) wp_unslash( $_POST['coauthors'] );
 				$coauthors = array_map( 'sanitize_text_field', $coauthors );
 				$this->add_coauthors( $post_id, $coauthors );
 			}
@@ -1055,7 +1055,7 @@ class coauthors_plus {
 	 */
 	public function ajax_suggest() {
 
-		if ( ! isset( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'coauthors-search' ) ) {
+		if ( ! isset( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'coauthors-search' ) ) {
 			die();
 		}
 
@@ -1063,8 +1063,8 @@ class coauthors_plus {
 			die();
 		}
 
-		$search = sanitize_text_field( strtolower( $_REQUEST['q'] ) );
-		$ignore = array_map( 'sanitize_text_field', explode( ',', $_REQUEST['existing_authors'] ) );
+		$search = strtolower( sanitize_text_field( wp_unslash( $_REQUEST['q'] ) ) );
+		$ignore = array_map( 'sanitize_text_field', explode( ',', wp_unslash( $_REQUEST['existing_authors'] ) ) );
 
 		$authors = $this->search_authors( $search, $ignore );
 
@@ -1550,7 +1550,7 @@ if ( ! function_exists( 'wp_notify_postauthor' ) ) :
 			}
 			$notify_message .= sprintf( __( 'Spam it: %s' ), admin_url( "comment.php?action=spam&c=$comment_id" ) ) . "\r\n";
 
-			$wp_email = 'wordpress@' . preg_replace( '#^www\.#', '', strtolower( $_SERVER['SERVER_NAME'] ) );
+			$wp_email = 'wordpress@' . preg_replace( '#^www\.#', '', strtolower( sanitize_text_field( wp_unslash( $_SERVER['SERVER_NAME'] ) ) ) );
 
 			if ( '' == $comment->comment_author ) {
 				$from = "From: \"$blogname\" <$wp_email>";
