@@ -11,6 +11,8 @@ jQuery( document ).ready(function () {
 		return false;
 	};
 
+	var $coauthors_loading;
+
 	function coauthors_delete( elem ) {
 
 		var $coauthor_row = jQuery( elem ).closest( '.coauthor-row' );
@@ -77,7 +79,7 @@ jQuery( document ).ready(function () {
 			var options = { addDelete: true, addEdit: false };
 
 			// Create autosuggest box and text tag
-			if ( ! co ) var co = coauthors_create_autosuggest( author, coName )
+			if ( ! co ) var co = coauthors_create_autosuggest( author.name, coName )
 			var tag = coauthors_create_author_tag( author );
 			var input = coauthors_create_author_hidden_input( author );
 			var $gravatar = coauthors_create_author_gravatar( author, 25 );
@@ -169,7 +171,8 @@ jQuery( document ).ready(function () {
 			})
 			.appendTo( $coauthors_div )
 			.suggest( coAuthorsPlus_ajax_suggest_link, {
-				onSelect: coauthors_autosuggest_select
+				onSelect: coauthors_autosuggest_select,
+				delay: 1000
 			})
 			.keydown( coauthors_autosuggest_keydown )
 			;
@@ -332,7 +335,6 @@ jQuery( document ).ready(function () {
 
 		// Create new author-suggest and append it to a new row
 		var newCO = coauthors_create_autosuggest( '', false );
-		var $coauthors_loading;
 		coauthors_add_to_table( newCO );
 
 		$coauthors_loading = jQuery( '#ajax-loading' ).clone().attr( 'id', 'coauthors-loading' );

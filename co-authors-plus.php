@@ -3,7 +3,7 @@
 Plugin Name: Co-Authors Plus
 Plugin URI: http://wordpress.org/extend/plugins/co-authors-plus/
 Description: Allows multiple authors to be assigned to a post. This plugin is an extended version of the Co-Authors plugin developed by Weston Ruter.
-Version: 3.1.2
+Version: 3.2.1
 Author: Mohammad Jangda, Daniel Bachhuber, Automattic
 Copyright: 2008-2015 Shared and distributed between Mohammad Jangda, Daniel Bachhuber, Weston Ruter
 
@@ -24,18 +24,19 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 */
 
-define( 'COAUTHORS_PLUS_VERSION', '3.1.2' );
+define( 'COAUTHORS_PLUS_VERSION', '3.2.1' );
 
 require_once( dirname( __FILE__ ) . '/template-tags.php' );
 require_once( dirname( __FILE__ ) . '/deprecated.php' );
 
 require_once( dirname( __FILE__ ) . '/php/class-coauthors-template-filters.php' );
+require_once( dirname( __FILE__ ) . '/php/integrations/amp.php' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once( dirname( __FILE__ ) . '/php/class-wp-cli.php' );
 }
 
-class coauthors_plus {
+class CoAuthors_Plus {
 
 	// Name for the taxonomy we're using to store relationships
 	// and the post type we're using to store co-authors
@@ -115,10 +116,6 @@ class coauthors_plus {
 		// Support infinite scroll for Guest Authors on author pages
 		add_filter( 'infinite_scroll_js_settings', array( $this, 'filter_infinite_scroll_js_settings' ), 10, 2 );
 
-	}
-
-	function coauthors_plus() {
-		$this->__construct();
 	}
 
 	/**
@@ -315,7 +312,7 @@ class coauthors_plus {
 	public function add_coauthors_box() {
 
 		if ( $this->is_post_type_enabled() && $this->current_user_can_set_authors() ) {
-			add_meta_box( $this->coauthors_meta_box_name, __( 'Authors', 'co-authors-plus' ), array( $this, 'coauthors_meta_box' ), get_post_type(), apply_filters( 'coauthors_meta_box_context', 'normal' ), apply_filters( 'coauthors_meta_box_priority', 'high' ) );
+			add_meta_box( $this->coauthors_meta_box_name, apply_filters( 'coauthors_meta_box_title', __( 'Authors', 'co-authors-plus' ) ), array( $this, 'coauthors_meta_box' ), get_post_type(), apply_filters( 'coauthors_meta_box_context', 'normal' ), apply_filters( 'coauthors_meta_box_priority', 'high' ) );
 		}
 	}
 
@@ -366,7 +363,7 @@ class coauthors_plus {
 					?>
 					<li>
 						<?php echo get_avatar( $coauthor->user_email, $this->gravatar_size ); ?>
-						<span id="coauthor-readonly-<?php echo $count; ?>" class="coauthor-tag">
+						<span id="<?php echo esc_attr( 'coauthor-readonly-' . $count ); ?>" class="coauthor-tag">
 							<input type="text" name="coauthorsinput[]" readonly="readonly" value="<?php echo esc_attr( $coauthor->display_name ); ?>" />
 							<input type="text" name="coauthors[]" value="<?php echo esc_attr( $coauthor->user_login ); ?>" />
 							<input type="text" name="coauthorsemails[]" value="<?php echo esc_attr( $coauthor->user_email ); ?>" />
@@ -378,14 +375,14 @@ class coauthors_plus {
 				?>
 				</ul>
 				<div class="clear"></div>
-				<p><?php _e( '<strong>Note:</strong> To edit post authors, please enable javascript or use a javascript-capable browser', 'co-authors-plus' ); ?></p>
+				<p><?php echo wp_kses( __( '<strong>Note:</strong> To edit post authors, please enable javascript or use a javascript-capable browser', 'co-authors-plus' ), array( 'strong' => array() ) ); ?></p>
 			</div>
 			<?php
 		endif;
 		?>
 
 		<div id="coauthors-edit" class="hide-if-no-js">
-			<p><?php _e( 'Click on an author to change them. Drag to change their order. Click on <strong>Remove</strong> to remove them.', 'co-authors-plus' ); ?></p>
+			<p><?php echo wp_kses( __( 'Click on an author to change them. Drag to change their order. Click on <strong>Remove</strong> to remove them.', 'co-authors-plus' ), array( 'strong' => array() ) ); ?></p>
 		</div>
 
 		<?php wp_nonce_field( 'coauthors-edit', 'coauthors-nonce' ); ?>
@@ -507,9 +504,9 @@ class coauthors_plus {
 		}
 		?>
 		<label class="inline-edit-group inline-edit-coauthors">
-			<span class="title"><?php _e( 'Authors', 'co-authors-plus' ) ?></span>
+			<span class="title"><?php esc_html_e( 'Authors', 'co-authors-plus' ) ?></span>
 			<div id="coauthors-edit" class="hide-if-no-js">
-				<p><?php _e( 'Click on an author to change them. Drag to change their order. Click on <strong>Remove</strong> to remove them.', 'co-authors-plus' ); ?></p>
+				<p><?php echo wp_kses( __( 'Click on an author to change them. Drag to change their order. Click on <strong>Remove</strong> to remove them.', 'co-authors-plus' ), array( 'strong' => array() ) ); ?></p>
 			</div>
 			<?php wp_nonce_field( 'coauthors-edit', 'coauthors-nonce' ); ?>
 		</label>
@@ -614,12 +611,18 @@ class coauthors_plus {
 			}
 
 			// Check to see that JOIN hasn't already been added. Props michaelingp and nbaxley
-			$term_relationship_join = " INNER JOIN {$wpdb->term_relationships} ON ({$wpdb->posts}.ID = {$wpdb->term_relationships}.object_id)";
-			$term_taxonomy_join = " INNER JOIN {$wpdb->term_taxonomy} ON ( {$wpdb->term_relationships}.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id )";
+			$term_relationship_inner_join = " INNER JOIN {$wpdb->term_relationships} ON ({$wpdb->posts}.ID = {$wpdb->term_relationships}.object_id)";
+			$term_relationship_left_join = " LEFT JOIN {$wpdb->term_relationships} ON ({$wpdb->posts}.ID = {$wpdb->term_relationships}.object_id)";
 
-			if ( false === strpos( $join, trim( $term_relationship_join ) ) ) {
-				$join .= str_replace( 'INNER JOIN', 'LEFT JOIN', $term_relationship_join );
+			$term_taxonomy_join  = " INNER JOIN {$wpdb->term_relationships} AS tr1 ON ({$wpdb->posts}.ID = tr1.object_id)";
+			$term_taxonomy_join .= " INNER JOIN {$wpdb->term_taxonomy} ON ( tr1.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id )";
+
+			// 4.6+ uses a LEFT JOIN for tax queries so we need to check for both
+			if ( false === strpos( $join, trim( $term_relationship_inner_join ) )
+				&& false === strpos( $join, trim( $term_relationship_left_join ) ) ) {
+				$join .= $term_relationship_left_join;
 			}
+
 			if ( false === strpos( $join, trim( $term_taxonomy_join ) ) ) {
 				$join .= str_replace( 'INNER JOIN', 'LEFT JOIN', $term_taxonomy_join );
 			}
@@ -1069,7 +1072,7 @@ class coauthors_plus {
 		$authors = $this->search_authors( $search, $ignore );
 
 		foreach ( $authors as $author ) {
-			echo $author->ID . ' | ' . $author->user_login . ' | ' . $author->display_name . ' | ' . $author->user_email . ' | ' . $author->user_nicename . "\n";
+			echo esc_html( $author->ID . ' | ' . $author->user_login . ' | ' . $author->display_name . ' | ' . $author->user_email . ' | ' . $author->user_nicename ) . "\n";
 		}
 
 		die();
@@ -1247,12 +1250,15 @@ class coauthors_plus {
 			<script type="text/javascript">
 				// AJAX link used for the autosuggest
 				var coAuthorsPlus_ajax_suggest_link = <?php
-				echo json_encode( add_query_arg( array(
-						'action' => 'coauthors_ajax_suggest',
-						'post_type' => rawurlencode( get_post_type() ),
-					),
-					wp_nonce_url( 'admin-ajax.php', 'coauthors-search' )
-				) ); ?>;
+				echo wp_json_encode(
+					add_query_arg(
+						array(
+							'action' => 'coauthors_ajax_suggest',
+							'post_type' => rawurlencode( get_post_type() ),
+						),
+						wp_nonce_url( 'admin-ajax.php', 'coauthors-search' )
+					)
+				); ?>;
 			</script>
 		<?php
 	}
@@ -1466,7 +1472,7 @@ class coauthors_plus {
 }
 
 global $coauthors_plus;
-$coauthors_plus = new coauthors_plus();
+$coauthors_plus = new CoAuthors_Plus();
 
 if ( ! function_exists( 'wp_notify_postauthor' ) ) :
 	/**
@@ -1595,6 +1601,7 @@ function cap_filter_comment_moderation_email_recipients( $recipients, $comment_i
 
 	if ( isset( $post_id ) ) {
 		$coauthors = get_coauthors( $post_id );
+		$extra_recipients = array();
 		foreach ( $coauthors as $user ) {
 			if ( ! empty( $user->user_email ) ) {
 				$extra_recipients[] = $user->user_email;
