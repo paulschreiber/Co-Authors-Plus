@@ -187,7 +187,7 @@ class CoAuthors_Guest_Authors
 			return;
 		}
 
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['nonce'] ) ), 'create-guest-author' ) ) {
+		if ( ! wp_verify_nonce( $_GET['nonce'], 'create-guest-author' ) ) {
 			wp_die( esc_html__( "Doin' something fishy, huh?", 'co-authors-plus' ) );
 		}
 
@@ -224,7 +224,7 @@ class CoAuthors_Guest_Authors
 		}
 
 		// Verify the user is who they say they are
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'delete-guest-author' ) ) {
+		if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'delete-guest-author' ) ) {
 			wp_die( esc_html__( "Doin' something fishy, huh?", 'co-authors-plus' ) );
 		}
 
@@ -453,7 +453,7 @@ class CoAuthors_Guest_Authors
 		// Allow guest authors to be deleted
 		if ( isset( $_GET['action'], $_GET['id'], $_GET['_wpnonce'] ) && 'delete' == $_GET['action'] ) {
 			// Make sure the user is who they say they are
-			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'guest-author-delete' ) ) {
+			if ( ! wp_verify_nonce( $_GET['_wpnonce'], 'guest-author-delete' ) ) {
 				wp_die( esc_html__( "Doin' something fishy, huh?", 'co-authors-plus' ) );
 			}
 
@@ -708,7 +708,7 @@ class CoAuthors_Guest_Authors
 		}
 
 		// @todo caps check
-		if ( ! isset( $_POST['guest-author-nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['guest-author-nonce'] ) ), 'guest-author-nonce' ) ) {
+		if ( ! isset( $_POST['guest-author-nonce'] ) || ! wp_verify_nonce( $_POST['guest-author-nonce'], 'guest-author-nonce' ) ) {
 			return $post_data;
 		}
 
@@ -760,7 +760,7 @@ class CoAuthors_Guest_Authors
 		}
 
 		// @todo caps check
-		if ( ! isset( $_POST['guest-author-nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['guest-author-nonce'] ) ), 'guest-author-nonce' ) ) {
+		if ( ! isset( $_POST['guest-author-nonce'] ) || ! wp_verify_nonce( $_POST['guest-author-nonce'], 'guest-author-nonce' ) ) {
 			return;
 		}
 

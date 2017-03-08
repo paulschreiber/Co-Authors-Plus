@@ -1058,7 +1058,7 @@ class CoAuthors_Plus {
 	 */
 	public function ajax_suggest() {
 
-		if ( ! isset( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'coauthors-search' ) ) {
+		if ( ! isset( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'coauthors-search' ) ) {
 			die();
 		}
 
