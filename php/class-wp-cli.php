@@ -6,6 +6,7 @@
  * @since 3.0
  * @see https://github.com/wp-cli/wp-cli
  */
+
 WP_CLI::add_command( 'co-authors-plus', 'CoAuthorsPlus_Command' );
 
 class CoAuthorsPlus_Command extends WP_CLI_Command {
@@ -20,9 +21,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 	public function create_guest_authors( $args, $assoc_args ) {
 		global $coauthors_plus;
 
-		$defaults = array(
-				// There are no arguments at this time
-		);
+		$defaults = array(); // No arguments at this time.
 		$this->args = wp_parse_args( $assoc_args, $defaults );
 
 		$users    = get_users();
@@ -53,7 +52,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 	public function create_terms_for_posts() {
 		global $coauthors_plus, $wp_post_types;
 
-		// Cache these to prevent repeated lookups
+		// Cache these to prevent repeated lookups.
 		$authors      = array();
 		$author_terms = array();
 
@@ -137,7 +136,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 		);
 		$this->args = wp_parse_args( $assoc_args, $defaults );
 
-		// For global use and not a part of WP_Query
+		// For global use and not a part of WP_Query.
 		$append_coauthors = $this->args['append_coauthors'];
 		unset( $this->args['append_coauthors'] );
 
@@ -153,7 +152,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 			foreach ( $posts->posts as $single_post ) {
 				$posts_total++;
 
-				// See if the value in the post meta field is the same as any of the existing coauthors
+				// See if the value in the post meta field is the same as any of the existing coauthors.
 				$original_author    = get_post_meta( $single_post->ID, $this->args['meta_key'], true );
 				$existing_coauthors = get_coauthors( $single_post->ID );
 				$already_associated = false;
@@ -168,7 +167,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 					continue;
 				}
 
-				// Make sure this original author exists as a co-author
+				// Make sure this original author exists as a co-author.
 				if ( ( ! $coauthor = $coauthors_plus->get_coauthor_by( 'user_login', $original_author ) ) &&
 					( ! $coauthor = $coauthors_plus->get_coauthor_by( 'user_login', sanitize_title( $original_author ) ) ) ) {
 					$posts_missing_coauthor++;
@@ -177,7 +176,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 					continue;
 				}
 
-				// Assign the coauthor to the post
+				// Assign the coauthor to the post.
 				$coauthors_plus->add_coauthors( $single_post->ID, array( $coauthor->user_nicename ), $append_coauthors );
 				WP_CLI::line( $posts_total . ': Post #' . $single_post->ID . ' has been assigned "' . $original_author . '" as the author' );
 				$posts_associated++;
@@ -287,7 +286,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 		$old_term       = $this->args['old_term'];
 		$new_term       = $this->args['new_term'];
 
-		// Get the reassignment data
+		// Get the reassignment data.
 		if ( $author_mapping && file_exists( $author_mapping ) ) {
 			require_once $author_mapping;
 			$authors_to_migrate = $cli_user_map;
@@ -296,7 +295,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 			exit;
 		}
 
-		// Alternate reassigment approach
+		// Alternate reassigment approach.
 		if ( $old_term && $new_term ) {
 			$authors_to_migrate = array(
 				$old_term => $new_term,
@@ -304,7 +303,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 		}
 
 		// For each author to migrate, check whether the term exists,
-		// whether the target term exists, and only do the migration if both are met
+		// whether the target term exists, and only do the migration if both are met.
 		$results = (object) array(
 			'old_term_missing' => 0,
 			'new_term_exists'  => 0,
@@ -316,7 +315,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 				$new_user = get_user_by( 'id', $new_user )->user_login;
 			}
 
-			// The old user should exist as a term
+			// The old user should exist as a term.
 			$old_term = $coauthors_plus->get_author_term( $coauthors_plus->get_coauthor_by( 'login', $old_user ) );
 			if ( ! $old_term ) {
 				WP_CLI::line( "Error: Term '{$old_user}' doesn't exist, skipping" );
@@ -325,8 +324,8 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 			}
 
 			// If the new user exists as a term already, we want to reassign all posts to that
-			// new term and delete the original
-			// Otherwise, simply rename the old term
+			// new term and delete the original.
+			// Otherwise, simply rename the old term.
 			$new_term = $coauthors_plus->get_author_term( $coauthors_plus->get_coauthor_by( 'login', $new_user ) );
 			if ( is_object( $new_term ) ) {
 				WP_CLI::line( "Success: There's already a '{$new_user}' term for '{$old_user}'. Reassigning {$old_term->count} posts and then deleting the term" );
@@ -489,7 +488,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 				$posts_total++;
 
 				if ( ! $dry ) {
-					// Remove the $from_userlogin from $coauthors
+					// Remove the $from_userlogin from $coauthors.
 					foreach ( $coauthors as $index => $user_login ) {
 						if ( $from_userlogin === $user_login ) {
 							unset( $coauthors[ $index ] );
@@ -498,10 +497,10 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 						}
 					}
 
-					// Add the 'to' author on
+					// Add the 'to' author on.
 					$coauthors[] = $to_userlogin;
 
-					// By not passing $append = false as the 3rd param, we replace all existing coauthors
+					// By not passing $append = false as the 3rd param, we replace all existing coauthors.
 					$coauthors_plus->add_coauthors( $post->ID, $coauthors, false );
 
 					WP_CLI::line( $posts_total . ': Post #' . $post->ID . ' has been assigned "' . $to_userlogin . '" as a co-author' );
@@ -512,7 +511,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 				}
 			}
 
-			// In dry mode, we must manually advance the page
+			// In dry mode, we must manually advance the page.
 			if ( $dry ) {
 				$query_args['paged']++;
 			}
@@ -593,7 +592,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 				WP_CLI::line( "Term {$author_term->slug} ({$author_term->term_id}) is already prefixed, skipping" );
 				continue;
 			}
-			// A prefixed term was accidentally created, and the old term needs to be merged into the new (WordPress.com VIP)
+			// A prefixed term was accidentally created, and the old term needs to be merged into the new (WordPress.com VIP).
 			if ( $prefixed_term = get_term_by( 'slug', 'cap-' . $author_term->slug, $coauthors_plus->coauthor_taxonomy ) ) {
 				WP_CLI::line( "Term {$author_term->slug} ({$author_term->term_id}) has a new term too: $prefixed_term->slug ($prefixed_term->term_id). Merging" );
 				$args = array(
@@ -603,7 +602,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 				wp_delete_term( $prefixed_term->term_id, $coauthors_plus->coauthor_taxonomy, $args );
 			}
 
-			// Term isn't prefixed, doesn't have a sibling, and should be updated
+			// Term isn't prefixed, doesn't have a sibling, and should be updated.
 			WP_CLI::line( "Term {$author_term->slug} ({$author_term->term_id}) isn't prefixed, adding one" );
 			$args = array(
 				'slug' => 'cap-' . $author_term->slug,
@@ -633,7 +632,8 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 			$new_count = get_term_by( 'id', $author_term->term_id, $coauthors_plus->coauthor_taxonomy )->count;
 			WP_CLI::line( "Term {$author_term->slug} ({$author_term->term_id}) changed from {$old_count} to {$new_count} and the description was refreshed" );
 		}
-		// Create author terms for any users that don't have them
+
+		// Create author terms for any users that don't have them.
 		$users = get_users();
 		foreach ( $users as $user ) {
 			$term = $coauthors_plus->get_author_term( $user );
@@ -643,7 +643,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 			}
 		}
 
-		// And create author terms for any Guest Authors that don't have them
+		// Create author terms for any Guest Authors that don't have them.
 		if ( $coauthors_plus->is_guest_authors_enabled() && $coauthors_plus->guest_authors instanceof CoAuthors_Guest_Authors ) {
 			$args = array(
 				'order'             => 'ASC',
@@ -747,7 +747,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 			WP_CLI::error( 'Failed to read WXR file.' );
 		}
 
-		// Get author nodes
+		// Get author nodes.
 		$authors = $import_data['authors'];
 
 		foreach ( $authors as $author ) {
@@ -798,12 +798,12 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 		while ( false !== ( $data = fgetcsv( $file ) ) ) {
 			if ( 0 === $row ) {
 				$field_keys = array_map( 'trim', $data );
-				// TODO: bail if required fields not found
+				// TODO: bail if required fields not found.
 			} else {
 				$row_data    = array_map( 'trim', $data );
 				$author_data = array();
 				foreach ( (array) $row_data as $col_num => $val ) {
-						// Don't use the value of the field key isn't set
+					// Don't use the value of the field key isn't set.
 					if ( empty( $field_keys[ $col_num ] ) ) {
 						continue;
 					}
@@ -889,7 +889,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 	private function stop_the_insanity() {
 		global $wpdb, $wp_object_cache;
 
-		$wpdb->queries = array(); // or define( 'WP_IMPORTING', true );
+		$wpdb->queries = array(); // phpcs:ignore or define( 'WP_IMPORTING', true );
 
 		if ( ! is_object( $wp_object_cache ) ) {
 			return;
@@ -901,7 +901,7 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 		$wp_object_cache->cache          = array();
 
 		if ( is_callable( $wp_object_cache, '__remoteset' ) ) {
-			$wp_object_cache->__remoteset(); // important
+			$wp_object_cache->__remoteset();
 		}
 	}
 }
