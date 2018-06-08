@@ -1,8 +1,13 @@
 <?php
 /**
- * Test Co-Authors Plus' modifications of author queries
+ * Author queried object tests.
+ *
+ * @package Co-Authors Plus
  */
 
+/**
+ * Test Co-Authors Plus' modifications of author queries
+ */
 class Test_Author_Queried_Object extends CoAuthorsPlus_TestCase {
 
 	/**
@@ -54,7 +59,9 @@ class Test_Author_Queried_Object extends CoAuthorsPlus_TestCase {
 		$this->go_to( get_author_posts_url( $author1 ) );
 		$this->assertQueryTrue( 'is_author', 'is_archive' );
 
-		// Add the user to the blog
+		/**
+		 * Add the user to the blog
+		 */
 		add_user_to_blog( $blog2, $author2, 'author' );
 
 		/**
@@ -63,7 +70,9 @@ class Test_Author_Queried_Object extends CoAuthorsPlus_TestCase {
 		$this->go_to( get_author_posts_url( $author2 ) );
 		$this->assertQueryTrue( 'is_author', 'is_archive' );
 
-		// Add the user as an author on the original post
+		/**
+		 * Add the user as an author on the original post
+		 */
 		$author2_obj = get_user_by( 'id', $author2 );
 		$coauthors_plus->add_coauthors( $blog2_post1, array( $author2_obj->user_login ), true );
 
@@ -73,7 +82,9 @@ class Test_Author_Queried_Object extends CoAuthorsPlus_TestCase {
 		$this->go_to( get_author_posts_url( $author2 ) );
 		$this->assertQueryTrue( 'is_author', 'is_archive' );
 
-		// Remove the user from the blog
+		/**
+		 * Remove the user from the blog
+		 */
 		remove_user_from_blog( $author2, $blog2 );
 
 		/**
@@ -82,7 +93,9 @@ class Test_Author_Queried_Object extends CoAuthorsPlus_TestCase {
 		$this->go_to( get_author_posts_url( $author2 ) );
 		$this->assertQueryTrue( 'is_author', 'is_archive' );
 
-		// Delete the user from the network
+		/**
+		 * Delete the user from the network
+		 */
 		wpmu_delete_user( $author2 );
 
 		/**

@@ -1,7 +1,18 @@
 <?php
+/**
+ * Template tag tests.
+ *
+ * @package Co-Authors Plus
+ */
 
+/**
+ * Test Co-Authors Plus' template tags.
+ */
 class Test_Template_Tags extends CoAuthorsPlus_TestCase {
 
+	/**
+	 * Set up for tests. Define filters and create users.
+	 */
 	public function setUp() {
 
 		parent::setUp();
@@ -632,7 +643,7 @@ class Test_Template_Tags extends CoAuthorsPlus_TestCase {
 		$authordata_backup = $authordata;
 		$authordata        = $this->author1;
 
-		// Shows that it's necessary to set $authordata to $this->author1
+		// Shows that it's necessary to set $authordata to $this->author1.
 		$this->assertEquals( $authordata, $this->author1, 'Global $authordata not matching expected $this->author1.' );
 
 		$this->author1->type = 'guest-author';
@@ -645,7 +656,7 @@ class Test_Template_Tags extends CoAuthorsPlus_TestCase {
 				'user_url' => 'example.org',
 			)
 		);
-		$authordata = get_userdata( $this->author1->ID ); // Because wp_update_user flushes cache, but does not update global var
+		$authordata = get_userdata( $this->author1->ID ); // Because wp_update_user flushes cache, but does not update global var.
 
 		$this->assertEquals( get_the_author_link(), coauthors_links_single( $this->author1 ), 'Co-Author link generation differs from Core author link one (with user_url)' );
 

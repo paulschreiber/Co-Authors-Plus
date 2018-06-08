@@ -1,7 +1,18 @@
 <?php
+/**
+ * General plugin tests.
+ *
+ * @package Co-Authors Plus
+ */
 
+/**
+ * Test Co-Authors Plus' functionality.
+ */
 class Test_CoAuthors_Plus extends CoAuthorsPlus_TestCase {
 
+	/**
+	 * Set up for tests. Create users.
+	 */
 	public function setUp() {
 
 		parent::setUp();

@@ -1,5 +1,13 @@
 <?php
+/**
+ * Author query tests.
+ *
+ * @package Co-Authors Plus
+ */
 
+/**
+ * Test Co-Authors Plus' author queries
+ */
 class Test_Author_Queries extends CoAuthorsPlus_TestCase {
 
 	public function test__author_arg__user_is_post_author() {

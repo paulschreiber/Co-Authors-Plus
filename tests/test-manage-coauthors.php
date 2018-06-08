@@ -1,7 +1,18 @@
 <?php
+/**
+ * User management tests.
+ *
+ * @package Co-Authors Plus
+ */
 
+/**
+ * Test Co-Authors Plus' management of authors and posts.
+ */
 class Test_Manage_CoAuthors extends CoAuthorsPlus_TestCase {
 
+	/**
+	 * Set up for tests. Create users.
+	 */
 	public function setUp() {
 		parent::setUp();
 
@@ -65,6 +76,9 @@ class Test_Manage_CoAuthors extends CoAuthorsPlus_TestCase {
 		$this->author1_page2 = wp_insert_post( $page );
 	}
 
+	/**
+	 * Tear down and clean up.
+	 */
 	public function tearDown() {
 		parent::tearDown();
 	}
@@ -78,13 +92,13 @@ class Test_Manage_CoAuthors extends CoAuthorsPlus_TestCase {
 		$coauthors = get_coauthors( $this->author1_post1 );
 		$this->assertEquals( 1, count( $coauthors ) );
 
-		// append = true, should preserve order
+		// append = true, should preserve order.
 		$editor1 = get_user_by( 'id', $this->editor1 );
 		$coauthors_plus->add_coauthors( $this->author1_post1, array( $editor1->user_login ), true );
 		$coauthors = get_coauthors( $this->author1_post1 );
 		$this->assertEquals( array( $this->author1, $this->editor1 ), wp_list_pluck( $coauthors, 'ID' ) );
 
-		// append = false, overrides existing authors
+		// append = false, overrides existing authors.
 		$coauthors_plus->add_coauthors( $this->author1_post1, array( $editor1->user_login ), false );
 		$coauthors = get_coauthors( $this->author1_post1 );
 		$this->assertEquals( array( $this->editor1 ), wp_list_pluck( $coauthors, 'ID' ) );
@@ -100,12 +114,12 @@ class Test_Manage_CoAuthors extends CoAuthorsPlus_TestCase {
 	public function test_add_coauthor_updates_post_author() {
 		global $coauthors_plus;
 
-		// append = true, preserves existing post_author
+		// append = true, preserves existing post_author.
 		$editor1 = get_user_by( 'id', $this->editor1 );
 		$coauthors_plus->add_coauthors( $this->author1_post1, array( $editor1->user_login ), true );
 		$this->assertEquals( $this->author1, get_post( $this->author1_post1 )->post_author );
 
-		// append = false, overrides existing post_author
+		// append = false, overrides existing post_author.
 		$coauthors_plus->add_coauthors( $this->author1_post1, array( $editor1->user_login ), false );
 		$this->assertEquals( $this->editor1, get_post( $this->author1_post1 )->post_author );
 
@@ -134,7 +148,9 @@ class Test_Manage_CoAuthors extends CoAuthorsPlus_TestCase {
 		$coauthors_plus->add_coauthors( $this->author1_page1, array( $editor1->user_login ) );
 		$this->assertEquals( 2, count_user_posts( $editor1->ID ) );
 
-		// Publish count to include posts and pages
+		/**
+		 * Publish count to include posts and pages
+		 */
 		$filter = function() {
 			return array( 'post', 'page' );
 		};
@@ -146,7 +162,7 @@ class Test_Manage_CoAuthors extends CoAuthorsPlus_TestCase {
 		$coauthors_plus->add_coauthors( $this->author1_page2, array( $editor1->user_login ) );
 		$this->assertEquals( 4, count_user_posts( $editor1->ID ) );
 
-		// Publish count is just pages
+		// Publish count is just pages.
 		remove_filter( 'coauthors_count_published_post_types', $filter );
 		$filter = function() {
 			return array( 'page' );

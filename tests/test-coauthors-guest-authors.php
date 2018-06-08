@@ -1,7 +1,18 @@
 <?php
+/**
+ * Guest author object tests.
+ *
+ * @package Co-Authors Plus
+ */
 
+/**
+ * Test Co-Authors Plus' guest authors.
+ */
 class Test_CoAuthors_Guest_Authors extends CoAuthorsPlus_TestCase {
 
+	/**
+	 * Set up for tests. Create users.
+	 */
 	public function setUp() {
 
 		parent::setUp();
@@ -662,7 +673,6 @@ class Test_CoAuthors_Guest_Authors extends CoAuthorsPlus_TestCase {
 
 		} catch ( Exception $e ) {
 
-			// $this->assertContains( $guest_author_obj->parent_page, $e->getMessage() );
 			$this->assertContains( 'page=view-guest-authors', $e->getMessage() );
 			$this->assertContains( 'message=guest-author-deleted', $e->getMessage() );
 		}
@@ -731,7 +741,7 @@ class Test_CoAuthors_Guest_Authors extends CoAuthorsPlus_TestCase {
 	 * @param string $location Redirected location.
 	 * @param int    $status   Status.
 	 *
-	 * @throws \Exception Redirection data.
+	 * @throws Exception Redirection data.
 	 *
 	 * @return void
 	 **/
