@@ -1,7 +1,6 @@
 <?php
 function coauthors_plus_upgrade( $from ) {
 	// TODO: handle upgrade failures
-
 	if ( $from < 2.0 ) {
 		coauthors_plus_upgrade_20();
 	}
@@ -15,7 +14,12 @@ function coauthors_plus_upgrade_20() {
 	global $coauthors_plus;
 
 	// Get all posts with meta_key _coauthor
-	$all_posts = get_posts( array( 'numberposts' => '-1', 'meta_key' => '_coauthor' ) );
+	$all_posts = get_posts(
+		array(
+			'numberposts' => '-1',
+			'meta_key'    => '_coauthor',
+		)
+	);
 
 	if ( is_array( $all_posts ) ) {
 		foreach ( $all_posts as $single_post ) {

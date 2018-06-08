@@ -34,14 +34,14 @@ Author - user with the role of author
 
 define( 'COAUTHORS_PLUS_VERSION', '3.3.0' );
 
-require_once( dirname( __FILE__ ) . '/template-tags.php' );
-require_once( dirname( __FILE__ ) . '/deprecated.php' );
+require_once dirname( __FILE__ ) . '/template-tags.php';
+require_once dirname( __FILE__ ) . '/deprecated.php';
 
-require_once( dirname( __FILE__ ) . '/php/class-coauthors-template-filters.php' );
-require_once( dirname( __FILE__ ) . '/php/integrations/amp.php' );
+require_once dirname( __FILE__ ) . '/php/class-coauthors-template-filters.php';
+require_once dirname( __FILE__ ) . '/php/integrations/amp.php';
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	require_once( dirname( __FILE__ ) . '/php/class-wp-cli.php' );
+	require_once dirname( __FILE__ ) . '/php/class-wp-cli.php';
 }
 
 class CoAuthors_Plus {
@@ -51,8 +51,8 @@ class CoAuthors_Plus {
 	var $coauthor_taxonomy = 'author';
 
 	var $coreauthors_meta_box_name = 'authordiv';
-	var $coauthors_meta_box_name = 'coauthorsdiv';
-	var $force_guest_authors = false;
+	var $coauthors_meta_box_name   = 'coauthorsdiv';
+	var $force_guest_authors       = false;
 
 	var $gravatar_size = 25;
 
@@ -87,7 +87,7 @@ class CoAuthors_Plus {
 		add_filter( 'wp_insert_post_data', array( $this, 'coauthors_set_post_author_field' ), 10, 2 );
 
 		// Action to reassign posts when a guest author is deleted
-		add_action( 'delete_user',  array( $this, 'delete_user_action' ) );
+		add_action( 'delete_user', array( $this, 'delete_user_action' ) );
 
 		add_filter( 'get_usernumposts', array( $this, 'filter_count_user_posts' ), 10, 2 );
 
@@ -125,12 +125,12 @@ class CoAuthors_Plus {
 		add_filter( 'infinite_scroll_js_settings', array( $this, 'filter_infinite_scroll_js_settings' ), 10, 2 );
 
 		// Delete Co-Author Cache on Post Save & Post Delete
-		add_action( 'save_post', array( $this, 'clear_cache') );
-		add_action( 'delete_post', array( $this, 'clear_cache') );
+		add_action( 'save_post', array( $this, 'clear_cache' ) );
+		add_action( 'delete_post', array( $this, 'clear_cache' ) );
 		add_action( 'set_object_terms', array( $this, 'clear_cache_on_terms_set' ), 10, 6 );
 
 		// Filter to correct author on author archive page
-		add_filter( 'get_the_archive_title', array( $this, 'filter_author_archive_title'), 10, 2 );
+		add_filter( 'get_the_archive_title', array( $this, 'filter_author_archive_title' ), 10, 2 );
 	}
 
 	/**
@@ -144,8 +144,8 @@ class CoAuthors_Plus {
 
 		// Load the Guest Authors functionality if needed
 		if ( $this->is_guest_authors_enabled() ) {
-			require_once( dirname( __FILE__ ) . '/php/class-coauthors-guest-authors.php' );
-			$this->guest_authors = new CoAuthors_Guest_Authors;
+			require_once dirname( __FILE__ ) . '/php/class-coauthors-guest-authors.php';
+			$this->guest_authors = new CoAuthors_Guest_Authors();
 			if ( apply_filters( 'coauthors_guest_authors_force', false ) ) {
 				$this->force_guest_authors = true;
 			}
@@ -154,7 +154,7 @@ class CoAuthors_Plus {
 		// Maybe automatically apply our template tags
 		if ( apply_filters( 'coauthors_auto_apply_template_tags', false ) ) {
 			global $coauthors_plus_template_filters;
-			$coauthors_plus_template_filters = new CoAuthors_Template_Filters;
+			$coauthors_plus_template_filters = new CoAuthors_Template_Filters();
 		}
 
 	}
@@ -167,13 +167,13 @@ class CoAuthors_Plus {
 		// Register new taxonomy so that we can store all of the relationships
 		$args = array(
 			'hierarchical' => false,
-			'label' => false,
-			'query_var' => false,
-			'rewrite' => false,
-			'public' => false,
-			'sort' => true,
-			'args' => array( 'orderby' => 'term_order' ),
-			'show_ui' => false,
+			'label'        => false,
+			'query_var'    => false,
+			'rewrite'      => false,
+			'public'       => false,
+			'sort'         => true,
+			'args'         => array( 'orderby' => 'term_order' ),
+			'show_ui'      => false,
 		);
 
 		// If we use the nasty SQL query, we need our custom callback. Otherwise, we still need to flush cache.
@@ -305,7 +305,7 @@ class CoAuthors_Plus {
 
 		if ( ! $post_type ) {
 			$post_type = get_post_type();
-			if ( is_admin() && ! $post_type) {
+			if ( is_admin() && ! $post_type ) {
 				$post_type = get_current_screen()->post_type;
 			}
 		}
@@ -457,18 +457,18 @@ class CoAuthors_Plus {
 			$count = 1;
 			foreach ( $authors as $author ) :
 				$args = array(
-						'author_name' => $author->user_nicename,
-					);
+					'author_name' => $author->user_nicename,
+				);
 				if ( 'post' != $post->post_type ) {
 					$args['post_type'] = $post->post_type;
 				}
 				$author_filter_url = add_query_arg( array_map( 'rawurlencode', $args ), admin_url( 'edit.php' ) );
 				?>
 				<a href="<?php echo esc_url( $author_filter_url ); ?>"
-				data-user_nicename="<?php echo esc_attr( $author->user_nicename ) ?>"
-				data-user_email="<?php echo esc_attr( $author->user_email ) ?>"
-				data-display_name="<?php echo esc_attr( $author->display_name ) ?>"
-				data-user_login="<?php echo esc_attr( $author->user_login ) ?>"
+				data-user_nicename="<?php echo esc_attr( $author->user_nicename ); ?>"
+				data-user_email="<?php echo esc_attr( $author->user_email ); ?>"
+				data-display_name="<?php echo esc_attr( $author->display_name ); ?>"
+				data-user_login="<?php echo esc_attr( $author->user_login ); ?>"
 				><?php echo esc_html( $author->display_name ); ?></a><?php echo ( $count < count( $authors ) ) ? ',' : ''; ?>
 				<?php
 				$count++;
@@ -502,7 +502,7 @@ class CoAuthors_Plus {
 		}
 		// We filter count_user_posts() so it provides an accurate number
 		$numposts = count_user_posts( $user_id );
-		$user = get_user_by( 'id', $user_id );
+		$user     = get_user_by( 'id', $user_id );
 		if ( $numposts > 0 ) {
 			$value .= "<a href='edit.php?author_name=$user->user_nicename' title='" . esc_attr__( 'View posts by this author', 'co-authors-plus' ) . "' class='edit'>";
 			$value .= $numposts;
@@ -522,7 +522,7 @@ class CoAuthors_Plus {
 		}
 		?>
 		<label class="inline-edit-group inline-edit-coauthors">
-			<span class="title"><?php esc_html_e( 'Authors', 'co-authors-plus' ) ?></span>
+			<span class="title"><?php esc_html_e( 'Authors', 'co-authors-plus' ); ?></span>
 			<div id="coauthors-edit" class="hide-if-no-js">
 				<p><?php echo wp_kses( __( 'Click on an author to change them. Drag to change their order. Click on <strong>Remove</strong> to remove them.', 'co-authors-plus' ), array( 'strong' => array() ) ); ?></p>
 			</div>
@@ -537,7 +537,7 @@ class CoAuthors_Plus {
 	function _update_users_posts_count( $tt_ids, $taxonomy ) {
 		global $wpdb;
 
-		$tt_ids = implode( ', ', array_map( 'intval', $tt_ids ) );
+		$tt_ids   = implode( ', ', array_map( 'intval', $tt_ids ) );
 		$term_ids = $wpdb->get_results( "SELECT term_id FROM $wpdb->term_taxonomy WHERE term_taxonomy_id IN ($tt_ids)" );
 
 		foreach ( (array) $term_ids as $term_id_result ) {
@@ -564,7 +564,7 @@ class CoAuthors_Plus {
 
 		$term_id = $wpdb->get_results( $wpdb->prepare( "SELECT term_id FROM $wpdb->term_taxonomy WHERE term_taxonomy_id = %d ", $tt_id ) );
 
-		$term = get_term_by( 'id', $term_id[0]->term_id, $taxonomy );
+		$term     = get_term_by( 'id', $term_id[0]->term_id, $taxonomy );
 		$coauthor = $this->get_coauthor_by( 'user_nicename', $term->slug );
 		if ( ! $coauthor ) {
 			return new WP_Error( 'missing-coauthor', __( 'No co-author exists for that term', 'co-authors-plus' ) );
@@ -630,7 +630,7 @@ class CoAuthors_Plus {
 
 			// Check to see that JOIN hasn't already been added. Props michaelingp and nbaxley
 			$term_relationship_inner_join = " INNER JOIN {$wpdb->term_relationships} ON ({$wpdb->posts}.ID = {$wpdb->term_relationships}.object_id)";
-			$term_relationship_left_join = " LEFT JOIN {$wpdb->term_relationships} AS tr1 ON ({$wpdb->posts}.ID = tr1.object_id)";
+			$term_relationship_left_join  = " LEFT JOIN {$wpdb->term_relationships} AS tr1 ON ({$wpdb->posts}.ID = tr1.object_id)";
 
 			$term_taxonomy_join = " INNER JOIN {$wpdb->term_taxonomy} ON ( tr1.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id )";
 
@@ -671,7 +671,7 @@ class CoAuthors_Plus {
 				}
 			}
 
-			$terms = array();
+			$terms    = array();
 			$coauthor = $this->get_coauthor_by( 'user_nicename', $author_name );
 			if ( $author_term = $this->get_author_term( $coauthor ) ) {
 				$terms[] = $author_term;
@@ -695,11 +695,11 @@ class CoAuthors_Plus {
 			$maybe_both_query = $maybe_both ? '$1 OR' : '';
 
 			if ( ! empty( $terms ) ) {
-				$terms_implode = '';
+				$terms_implode      = '';
 				$this->having_terms = '';
 				foreach ( $terms as $term ) {
-					$terms_implode .= '(' . $wpdb->term_taxonomy . '.taxonomy = \''. $this->coauthor_taxonomy.'\' AND '. $wpdb->term_taxonomy .'.term_id = \''. $term->term_id .'\') OR ';
-					$this->having_terms .= ' ' . $wpdb->term_taxonomy .'.term_id = \''. $term->term_id .'\' OR ';
+					$terms_implode      .= '(' . $wpdb->term_taxonomy . '.taxonomy = \'' . $this->coauthor_taxonomy . '\' AND ' . $wpdb->term_taxonomy . '.term_id = \'' . $term->term_id . '\') OR ';
+					$this->having_terms .= ' ' . $wpdb->term_taxonomy . '.term_id = \'' . $term->term_id . '\' OR ';
 				}
 				$terms_implode = rtrim( $terms_implode, ' OR' );
 
@@ -710,10 +710,10 @@ class CoAuthors_Plus {
 
 					$maybe_both_query = $maybe_both ? '$0 OR' : '';
 
-					$where = preg_replace( '/\s\b(?:' . $wpdb->posts . '\.)?post_author\s*IN\s*(.*' . $id . '.)/', ' (' . $maybe_both_query . ' ' . $terms_implode . ')', $where, -1 ); #' . $wpdb->postmeta . '.meta_id IS NOT NULL AND
+					$where = preg_replace( '/\s\b(?:' . $wpdb->posts . '\.)?post_author\s*IN\s*(.*' . $id . '.)/', ' (' . $maybe_both_query . ' ' . $terms_implode . ')', $where, -1 ); // ' . $wpdb->postmeta . '.meta_id IS NOT NULL AND
 
 				} else {
-					$where = preg_replace( '/(\b(?:' . $wpdb->posts . '\.)?post_author\s*=\s*(' . $id . '))/', '(' . $maybe_both_query . ' ' . $terms_implode . ')', $where, -1 ); #' . $wpdb->postmeta . '.meta_id IS NOT NULL AND
+					$where = preg_replace( '/(\b(?:' . $wpdb->posts . '\.)?post_author\s*=\s*(' . $id . '))/', '(' . $maybe_both_query . ' ' . $terms_implode . ')', $where, -1 ); // ' . $wpdb->postmeta . '.meta_id IS NOT NULL AND
 				}
 
 				// the block targets the private posts clause (if it exists)
@@ -726,10 +726,10 @@ class CoAuthors_Plus {
 					$current_coauthor_term = $this->get_author_term( $current_coauthor );
 
 					if ( is_a( $current_coauthor_term, 'WP_Term' ) ) {
-						$current_user_query = $wpdb->term_taxonomy . '.taxonomy = \'' . $this->coauthor_taxonomy . '\' AND ' . $wpdb->term_taxonomy . '.term_id = \'' . $current_coauthor_term->term_id . '\'';
+						$current_user_query  = $wpdb->term_taxonomy . '.taxonomy = \'' . $this->coauthor_taxonomy . '\' AND ' . $wpdb->term_taxonomy . '.term_id = \'' . $current_coauthor_term->term_id . '\'';
 						$this->having_terms .= ' ' . $wpdb->term_taxonomy . '.term_id = \'' . $current_coauthor_term->term_id . '\' OR ';
 
-						$where = preg_replace( '/(\b(?:' . $wpdb->posts . '\.)?post_author\s*=\s*(' . get_current_user_id() . '))/', $current_user_query, $where, - 1 ); #' . $wpdb->postmeta . '.meta_id IS NOT NULL AND}
+						$where = preg_replace( '/(\b(?:' . $wpdb->posts . '\.)?post_author\s*=\s*(' . get_current_user_id() . '))/', $current_user_query, $where, - 1 ); // ' . $wpdb->postmeta . '.meta_id IS NOT NULL AND}
 					}
 				}
 
@@ -753,7 +753,7 @@ class CoAuthors_Plus {
 			}
 
 			if ( $this->having_terms ) {
-				$having = 'MAX( IF ( ' . $wpdb->term_taxonomy . '.taxonomy = \''. $this->coauthor_taxonomy.'\', IF ( ' . $this->having_terms . ',2,1 ),0 ) ) <> 1 ';
+				$having  = 'MAX( IF ( ' . $wpdb->term_taxonomy . '.taxonomy = \'' . $this->coauthor_taxonomy . '\', IF ( ' . $this->having_terms . ',2,1 ),0 ) ) <> 1 ';
 				$groupby = $wpdb->posts . '.ID HAVING ' . $having;
 			}
 		}
@@ -787,7 +787,7 @@ class CoAuthors_Plus {
 				// because it'll be the valid user ID
 				if ( 'guest-author' == $author_data->type && ! empty( $author_data->linked_account ) ) {
 					$data['post_author'] = get_user_by( 'login', $author_data->linked_account )->ID;
-				} else if ( 'wpuser' === $author_data->type ) {
+				} elseif ( 'wpuser' === $author_data->type ) {
 					$data['post_author'] = $author_data->ID;
 				}
 			}
@@ -795,7 +795,7 @@ class CoAuthors_Plus {
 
 		// If for some reason we don't have the co-authors fields set
 		if ( ! isset( $data['post_author'] ) ) {
-			$user = wp_get_current_user();
+			$user                = wp_get_current_user();
 			$data['post_author'] = $user->ID;
 		}
 
@@ -856,7 +856,7 @@ class CoAuthors_Plus {
 		global $current_user, $wpdb;
 
 		$post_id = (int) $post_id;
-		$insert = false;
+		$insert  = false;
 
 		// Best way to persist order
 		if ( $append ) {
@@ -871,14 +871,14 @@ class CoAuthors_Plus {
 		}
 
 		// Set the co-authors
-		$coauthors = array_unique( array_merge( $existing_coauthors, $coauthors ) );
+		$coauthors        = array_unique( array_merge( $existing_coauthors, $coauthors ) );
 		$coauthor_objects = array();
 		foreach ( $coauthors as &$author_name ) {
 
-			$author = $this->get_coauthor_by( 'user_nicename', $author_name );
+			$author             = $this->get_coauthor_by( 'user_nicename', $author_name );
 			$coauthor_objects[] = $author;
-			$term = $this->update_author_term( $author );
-			$author_name = $term->slug;
+			$term               = $this->update_author_term( $author );
+			$author_name        = $term->slug;
 		}
 		wp_set_post_terms( $post_id, $coauthors, $this->coauthor_taxonomy, false );
 
@@ -909,6 +909,7 @@ class CoAuthors_Plus {
 	 * Action taken when co-author is deleted.
 	 * - Co-Author term is removed from all associated posts
 	 * - Option to specify alternate co-author in place for each post
+	 *
 	 * @param delete_id
 	 */
 	function delete_user_action( $delete_id ) {
@@ -962,23 +963,23 @@ class CoAuthors_Plus {
 		}
 
 		global $wpdb;
-		$orderby = 'ORDER BY tr.term_order';
-		$order = 'ASC';
-		$object_ids = (int) $object_ids;
-		$query = $wpdb->prepare( "SELECT t.name, t.term_id, tt.term_taxonomy_id FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON tt.term_id = t.term_id INNER JOIN $wpdb->term_relationships AS tr ON tr.term_taxonomy_id = tt.term_taxonomy_id WHERE tt.taxonomy IN (%s) AND tr.object_id IN (%s) $orderby $order", $this->coauthor_taxonomy, $object_ids );
+		$orderby       = 'ORDER BY tr.term_order';
+		$order         = 'ASC';
+		$object_ids    = (int) $object_ids;
+		$query         = $wpdb->prepare( "SELECT t.name, t.term_id, tt.term_taxonomy_id FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON tt.term_id = t.term_id INNER JOIN $wpdb->term_relationships AS tr ON tr.term_taxonomy_id = tt.term_taxonomy_id WHERE tt.taxonomy IN (%s) AND tr.object_id IN (%s) $orderby $order", $this->coauthor_taxonomy, $object_ids );
 		$raw_coauthors = $wpdb->get_results( $query );
-		$terms = array();
+		$terms         = array();
 		foreach ( $raw_coauthors as $author ) {
 			if ( true === is_array( $args ) && true === isset( $args['fields'] ) ) {
 				switch ( $args['fields'] ) {
-					case 'names' :
+					case 'names':
 						$terms[] = $author->name;
 						break;
-					case 'tt_ids' :
+					case 'tt_ids':
 						$terms[] = $author->term_taxonomy_id;
 						break;
-					case 'all' :
-					default :
+					case 'all':
+					default:
 						$terms[] = get_term( $author->term_id, $this->coauthor_taxonomy );
 						break;
 				}
@@ -999,11 +1000,11 @@ class CoAuthors_Plus {
 
 		$user = $this->get_coauthor_by( 'user_nicename', $user->user_nicename );
 
-		$term = $this->get_author_term( $user );
+		$term       = $this->get_author_term( $user );
 		$guest_term = get_term_by( 'slug', 'cap-' . $user->user_nicename, $this->coauthor_taxonomy );
 		// Only modify the count if it has a linked account with posts or the author exists as a term
 		if ( $user->linked_account && $guest_term->count ) {
-			if ( $term && ! is_wp_error( $term )) {
+			if ( $term && ! is_wp_error( $term ) ) {
 				$count = $guest_term->count + $term->count;
 			} else {
 				$count = $guest_term->count;
@@ -1027,12 +1028,10 @@ class CoAuthors_Plus {
 				// if user is on pages, you need to grab post type another way
 				$current_screen = get_current_screen();
 				$post_type      = ( ! empty( $current_screen->post_type ) ) ? $current_screen->post_type : '';
-			}
-			else {
+			} else {
 				$post_type = $post->post_type;
 			}
-		}
-		else {
+		} else {
 			$post_type = $post->post_type;
 		}
 
@@ -1042,7 +1041,7 @@ class CoAuthors_Plus {
 		}
 
 		$post_type_object = get_post_type_object( $post_type );
-		$current_user = wp_get_current_user();
+		$current_user     = wp_get_current_user();
 		if ( ! $current_user ) {
 			return false;
 		}
@@ -1087,17 +1086,17 @@ class CoAuthors_Plus {
 
 		if ( is_object( $author ) ) {
 			$authordata = $author;
-			$term = $this->get_author_term( $authordata );
+			$term       = $this->get_author_term( $authordata );
 		}
 
 		if ( is_object( $authordata ) || ! empty( $term ) ) {
-			$wp_query->queried_object = $authordata;
+			$wp_query->queried_object    = $authordata;
 			$wp_query->queried_object_id = $authordata->ID;
 			add_filter( 'pre_handle_404', '__return_true' );
 		} else {
 			$wp_query->queried_object = $wp_query->queried_object_id = null;
-			$wp_query->is_author = $wp_query->is_archive = false;
-			$wp_query->is_404 = false;
+			$wp_query->is_author      = $wp_query->is_archive = false;
+			$wp_query->is_404         = false;
 		}
 	}
 
@@ -1119,7 +1118,7 @@ class CoAuthors_Plus {
 		$author = get_queried_object();
 
 		if ( $author && 'guest-author' == $author->type ) {
-			unset( $settings['query_args'][$this->coauthor_taxonomy] );
+			unset( $settings['query_args'][ $this->coauthor_taxonomy ] );
 
 			$settings['query_args']['author_name'] = $author->user_nicename;
 		}
@@ -1146,7 +1145,9 @@ class CoAuthors_Plus {
 		$authors = $this->search_authors( $search, $ignore );
 
 		// Return message if no authors found
-		if( empty( $authors ) ) echo apply_filters( 'coauthors_no_matching_authors_message', 'Sorry, no matching authors found.');
+		if ( empty( $authors ) ) {
+			echo apply_filters( 'coauthors_no_matching_authors_message', 'Sorry, no matching authors found.' );
+		}
 
 		foreach ( $authors as $author ) {
 			echo esc_html( $author->ID . ' | ' . $author->user_login . ' | ' . $author->display_name . ' | ' . $author->user_email . ' | ' . rawurldecode( $author->user_nicename ) ) . "\n";
@@ -1165,17 +1166,17 @@ class CoAuthors_Plus {
 		// instead of the user details. If the term is missing, we probably need to
 		// backfill with user details. Let's do this first... easier than running
 		// an upgrade script that could break on a lot of users
-		$args = array(
-				'count_total' => false,
-				'search' => sprintf( '*%s*', $search ),
-				'search_columns' => array(
-					'ID',
-					'display_name',
-					'user_email',
-					'user_login',
-				),
-				'fields' => 'all_with_meta',
-			);
+		$args        = array(
+			'count_total'    => false,
+			'search'         => sprintf( '*%s*', $search ),
+			'search_columns' => array(
+				'ID',
+				'display_name',
+				'user_email',
+				'user_login',
+			),
+			'fields'         => 'all_with_meta',
+		);
 		$found_users = get_users( $args );
 
 		foreach ( $found_users as $found_user ) {
@@ -1186,10 +1187,10 @@ class CoAuthors_Plus {
 		}
 
 		$args = array(
-				'search' => $search,
-				'get' => 'all',
-				'number' => 10,
-			);
+			'search' => $search,
+			'get'    => 'all',
+			'number' => 10,
+		);
 		$args = apply_filters( 'coauthors_search_authors_get_terms_args', $args );
 		add_filter( 'terms_clauses', array( $this, 'filter_terms_clauses' ) );
 		$found_terms = get_terms( $this->coauthor_taxonomy, $args );
@@ -1214,7 +1215,7 @@ class CoAuthors_Plus {
 			// Make sure the user is contributor and above (or a custom cap)
 			if ( in_array( $found_user->user_login, $ignored_authors ) ) {
 				unset( $found_users[ $key ] );
-			} else if ( 'wpuser' === $found_user->type && false === $found_user->has_cap( apply_filters( 'coauthors_edit_author_cap', 'edit_posts' ) ) ) {
+			} elseif ( 'wpuser' === $found_user->type && false === $found_user->has_cap( apply_filters( 'coauthors_edit_author_cap', 'edit_posts' ) ) ) {
 				unset( $found_users[ $key ] );
 			}
 		}
@@ -1248,13 +1249,13 @@ class CoAuthors_Plus {
 		wp_enqueue_script( 'co-authors-plus-js', plugins_url( 'js/co-authors-plus.js', __FILE__ ), array( 'jquery', 'suggest' ), COAUTHORS_PLUS_VERSION, true );
 
 		$js_strings = array(
-			'edit_label' => __( 'Edit', 'co-authors-plus' ),
-			'delete_label' => __( 'Remove', 'co-authors-plus' ),
-			'confirm_delete' => __( 'Are you sure you want to remove this author?', 'co-authors-plus' ),
+			'edit_label'      => __( 'Edit', 'co-authors-plus' ),
+			'delete_label'    => __( 'Remove', 'co-authors-plus' ),
+			'confirm_delete'  => __( 'Are you sure you want to remove this author?', 'co-authors-plus' ),
 			'input_box_title' => __( 'Click to change this author, or drag to change their position', 'co-authors-plus' ),
 			'search_box_text' => __( 'Search for an author', 'co-authors-plus' ),
-			'help_text' => __( 'Click on an author to change them. Drag to change their order. Click on <strong>Remove</strong> to remove them.', 'co-authors-plus' ),
-			);
+			'help_text'       => __( 'Click on an author to change them. Drag to change their order. Click on <strong>Remove</strong> to remove them.', 'co-authors-plus' ),
+		);
 		wp_localize_script( 'co-authors-plus-js', 'coAuthorsPlusStrings', $js_strings );
 
 	}
@@ -1281,11 +1282,11 @@ class CoAuthors_Plus {
 			return $views;
 		}
 
-		$views = array_reverse( $views );
-		$all_view = array_pop( $views );
+		$views     = array_reverse( $views );
+		$all_view  = array_pop( $views );
 		$mine_args = array(
-				'author_name'           => wp_get_current_user()->user_nicename,
-			);
+			'author_name' => wp_get_current_user()->user_nicename,
+		);
 		if ( 'post' != get_post_type() ) {
 			$mine_args['post_type'] = get_post_type();
 		}
@@ -1297,7 +1298,7 @@ class CoAuthors_Plus {
 		$views['mine'] = $view_mine = '<a' . $class . ' href="' . esc_url( add_query_arg( array_map( 'rawurlencode', $mine_args ), admin_url( 'edit.php' ) ) ) . '">' . __( 'Mine', 'co-authors-plus' ) . '</a>';
 
 		$views['all'] = str_replace( $class, '', $all_view );
-		$views = array_reverse( $views );
+		$views        = array_reverse( $views );
 
 		return $views;
 	}
@@ -1307,22 +1308,25 @@ class CoAuthors_Plus {
 	 */
 	public function js_vars() {
 
-		if ( ! $this->is_valid_page() || ! $this->is_post_type_enabled() || ! $this-> current_user_can_set_authors() ) {
+		if ( ! $this->is_valid_page() || ! $this->is_post_type_enabled() || ! $this->current_user_can_set_authors() ) {
 			return;
 		}
 		?>
 			<script type="text/javascript">
 				// AJAX link used for the autosuggest
-				var coAuthorsPlus_ajax_suggest_link = <?php
+				var coAuthorsPlus_ajax_suggest_link = 
+				<?php
 				echo wp_json_encode(
 					add_query_arg(
 						array(
-							'action' => 'coauthors_ajax_suggest',
+							'action'    => 'coauthors_ajax_suggest',
 							'post_type' => rawurlencode( get_post_type() ),
 						),
 						wp_nonce_url( 'admin-ajax.php', 'coauthors-search' )
 					)
-				); ?>;
+				);
+				?>
+				;
 			</script>
 		<?php
 	}
@@ -1343,7 +1347,7 @@ class CoAuthors_Plus {
 	 */
 	function filter_user_has_cap( $allcaps, $caps, $args ) {
 
-		$cap = $args[0];
+		$cap     = $args[0];
 		$user_id = isset( $args[1] ) ? $args[1] : 0;
 		$post_id = isset( $args[2] ) ? $args[2] : 0;
 
@@ -1353,10 +1357,10 @@ class CoAuthors_Plus {
 		}
 
 		$caps_to_modify = array(
-				$obj->cap->edit_post,
-				'edit_post', // Need to filter this too, unfortunately: http://core.trac.wordpress.org/ticket/22415
-				$obj->cap->edit_others_posts, // This as well: http://core.trac.wordpress.org/ticket/22417
-			);
+			$obj->cap->edit_post,
+			'edit_post', // Need to filter this too, unfortunately: http://core.trac.wordpress.org/ticket/22415
+			$obj->cap->edit_others_posts, // This as well: http://core.trac.wordpress.org/ticket/22417
+		);
 		if ( ! in_array( $cap, $caps_to_modify ) ) {
 			return $allcaps;
 		}
@@ -1435,9 +1439,9 @@ class CoAuthors_Plus {
 			}
 		} else {
 			$coauthor_slug = 'cap-' . $coauthor->user_nicename;
-			$args = array(
-				'slug'          => $coauthor_slug,
-				'description'   => $term_description,
+			$args          = array(
+				'slug'        => $coauthor_slug,
+				'description' => $term_description,
 			);
 
 			$new_term = wp_insert_term( $coauthor->user_login, $this->coauthor_taxonomy, $args );
@@ -1452,7 +1456,7 @@ class CoAuthors_Plus {
 	 * @see https://github.com/Automattic/Co-Authors-Plus/issues/2
 	 *
 	 * @param array $information_fields
-	 * @param int $post_id
+	 * @param int   $post_id
 	 * @return array
 	 */
 	function filter_ef_calendar_item_information_fields( $information_fields, $post_id ) {
@@ -1464,13 +1468,13 @@ class CoAuthors_Plus {
 
 		$co_authors = get_coauthors( $post_id );
 		if ( count( $co_authors ) > 1 ) {
-			$information_fields[$this->coauthor_taxonomy]['label'] = __( 'Authors', 'co-authors-plus' );
+			$information_fields[ $this->coauthor_taxonomy ]['label'] = __( 'Authors', 'co-authors-plus' );
 		}
 		$co_authors_names = '';
 		foreach ( $co_authors as $co_author ) {
 			$co_authors_names .= $co_author->display_name . ', ';
 		}
-		$information_fields[$this->coauthor_taxonomy]['value'] = rtrim( $co_authors_names, ', ' );
+		$information_fields[ $this->coauthor_taxonomy ]['value'] = rtrim( $co_authors_names, ', ' );
 		return $information_fields;
 	}
 
@@ -1491,7 +1495,7 @@ class CoAuthors_Plus {
 			return $column_name;
 		}
 
-		$co_authors = get_coauthors( $post->ID );
+		$co_authors       = get_coauthors( $post->ID );
 		$co_authors_names = '';
 		foreach ( $co_authors as $co_author ) {
 			$co_authors_names .= $co_author->display_name . ', ';
@@ -1511,7 +1515,7 @@ class CoAuthors_Plus {
 	public function filter_jetpack_open_graph_tags( $og_tags, $image_dimensions ) {
 
 		if ( is_author() ) {
-			$author = get_queried_object();
+			$author                        = get_queried_object();
 			$og_tags['og:title']           = $author->display_name;
 			$og_tags['og:url']             = get_author_posts_url( $author->ID, $author->user_nicename );
 			$og_tags['og:description']     = $author->description;
@@ -1520,7 +1524,7 @@ class CoAuthors_Plus {
 			if ( isset( $og_tags['article:author'] ) ) {
 				$og_tags['article:author'] = get_author_posts_url( $author->ID, $author->user_nicename );
 			}
-		} else if ( is_singular() && $this->is_post_type_enabled() ) {
+		} elseif ( is_singular() && $this->is_post_type_enabled() ) {
 			$authors = get_coauthors();
 			if ( ! empty( $authors ) ) {
 				$author = array_shift( $authors );
@@ -1549,14 +1553,16 @@ class CoAuthors_Plus {
 			return array();
 		}
 
-		$cache_key = 'coauthors_post_' . $post_id;
+		$cache_key      = 'coauthors_post_' . $post_id;
 		$coauthor_terms = wp_cache_get( $cache_key, 'co-authors-plus' );
 
 		if ( false === $coauthor_terms ) {
-			$coauthor_terms = wp_get_object_terms( $post_id, $this->coauthor_taxonomy, array(
-				'orderby' => 'term_order',
-				'order' => 'ASC',
-			) );
+			$coauthor_terms = wp_get_object_terms(
+				$post_id, $this->coauthor_taxonomy, array(
+					'orderby' => 'term_order',
+					'order'   => 'ASC',
+				)
+			);
 
 			// This usually happens if the taxonomy doesn't exist, which should never happen, but you never know.
 			if ( is_wp_error( $coauthor_terms ) ) {
@@ -1601,7 +1607,7 @@ class CoAuthors_Plus {
 	public function filter_author_archive_title() {
 		if ( is_author() ) {
 			$author_slug = sanitize_user( get_query_var( 'author_name' ) );
-			$author = $this->get_coauthor_by( 'user_nicename', $author_slug );
+			$author      = $this->get_coauthor_by( 'user_nicename', $author_slug );
 			return sprintf( __( 'Author: %s' ), $author->display_name );
 		}
 	}
@@ -1618,13 +1624,13 @@ if ( ! function_exists( 'wp_notify_postauthor' ) ) :
 	 *
 	 * @since 2.6.2
 	 *
-	 * @param int $comment_id Comment ID
+	 * @param int    $comment_id Comment ID
 	 * @param string $comment_type Optional. The comment type either 'comment' (default), 'trackback', or 'pingback'
 	 * @return bool False if user email does not exist. True on completion.
 	 */
 	function wp_notify_postauthor( $comment_id, $comment_type = '' ) {
-		$comment = get_comment( $comment_id );
-		$post    = get_post( $comment->comment_post_ID );
+		$comment   = get_comment( $comment_id );
+		$post      = get_post( $comment->comment_post_ID );
 		$coauthors = get_coauthors( $post->ID );
 		foreach ( $coauthors as $author ) {
 
@@ -1654,7 +1660,7 @@ if ( ! function_exists( 'wp_notify_postauthor' ) ) :
 			}
 
 			if ( 'comment' == $comment_type ) {
-				$notify_message  = sprintf( __( 'New comment on your post "%s"' ), $post->post_title ) . "\r\n";
+				$notify_message = sprintf( __( 'New comment on your post "%s"' ), $post->post_title ) . "\r\n";
 				/* translators: 1: comment author, 2: author IP, 3: author domain */
 				$notify_message .= sprintf( __( 'Author : %1$s (IP: %2$s , %3$s)' ), $comment->comment_author, $comment->comment_author_IP, $comment_author_domain ) . "\r\n";
 				$notify_message .= sprintf( __( 'E-mail : %s' ), $comment->comment_author_email ) . "\r\n";
@@ -1665,7 +1671,7 @@ if ( ! function_exists( 'wp_notify_postauthor' ) ) :
 				/* translators: 1: blog name, 2: post title */
 				$subject = sprintf( __( '[%1$s] Comment: "%2$s"' ), $blogname, $post->post_title );
 			} elseif ( 'trackback' == $comment_type ) {
-				$notify_message  = sprintf( __( 'New trackback on your post "%s"' ), $post->post_title ) . "\r\n";
+				$notify_message = sprintf( __( 'New trackback on your post "%s"' ), $post->post_title ) . "\r\n";
 				/* translators: 1: website name, 2: author IP, 3: author domain */
 				$notify_message .= sprintf( __( 'Website: %1$s (IP: %2$s , %3$s)' ), $comment->comment_author, $comment->comment_author_IP, $comment_author_domain ) . "\r\n";
 				$notify_message .= sprintf( __( 'URL    : %s' ), $comment->comment_author_url ) . "\r\n";
@@ -1674,7 +1680,7 @@ if ( ! function_exists( 'wp_notify_postauthor' ) ) :
 				/* translators: 1: blog name, 2: post title */
 				$subject = sprintf( __( '[%1$s] Trackback: "%2$s"' ), $blogname, $post->post_title );
 			} elseif ( 'pingback' == $comment_type ) {
-				$notify_message  = sprintf( __( 'New pingback on your post "%s"' ), $post->post_title ) . "\r\n";
+				$notify_message = sprintf( __( 'New pingback on your post "%s"' ), $post->post_title ) . "\r\n";
 				/* translators: 1: comment author, 2: author IP, 3: author domain */
 				$notify_message .= sprintf( __( 'Website: %1$s (IP: %2$s , %3$s)' ), $comment->comment_author, $comment->comment_author_IP, $comment_author_domain ) . "\r\n";
 				$notify_message .= sprintf( __( 'URL    : %s' ), $comment->comment_author_url ) . "\r\n";
@@ -1713,8 +1719,8 @@ if ( ! function_exists( 'wp_notify_postauthor' ) ) :
 				$message_headers .= $reply_to . "\n";
 			}
 
-			$notify_message = apply_filters( 'comment_notification_text', $notify_message, $comment_id );
-			$subject = apply_filters( 'comment_notification_subject', $subject, $comment_id );
+			$notify_message  = apply_filters( 'comment_notification_text', $notify_message, $comment_id );
+			$subject         = apply_filters( 'comment_notification_subject', $subject, $comment_id );
 			$message_headers = apply_filters( 'comment_notification_headers', $message_headers, $comment_id );
 
 			@wp_mail( $author->user_email, $subject, $notify_message, $message_headers );
@@ -1728,7 +1734,7 @@ endif;
  * Filter array of moderation notification email addresses
  *
  * @param array $recipients
- * @param int $comment_id
+ * @param int   $comment_id
  * @return array
  */
 function cap_filter_comment_moderation_email_recipients( $recipients, $comment_id ) {
@@ -1736,7 +1742,7 @@ function cap_filter_comment_moderation_email_recipients( $recipients, $comment_i
 	$post_id = $comment->comment_post_ID;
 
 	if ( isset( $post_id ) ) {
-		$coauthors = get_coauthors( $post_id );
+		$coauthors        = get_coauthors( $post_id );
 		$extra_recipients = array();
 		foreach ( $coauthors as $user ) {
 			if ( ! empty( $user->user_email ) ) {
