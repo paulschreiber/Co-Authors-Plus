@@ -1,5 +1,11 @@
 <?php
 /**
+ * WordPress.com-specific actions and filters
+ *
+ * @package Co-Authors Plus
+ */
+
+/**
  * Helper for themes where CAP should be auto-activated.
  */
 function wpcom_vip_get_coauthors_plus_auto_apply_themes() {
@@ -36,7 +42,7 @@ if ( function_exists( 'Enterprise' ) ) {
 		add_action(
 			'admin_notices', function() {
 
-				// Allow this to be short-circuted in mu-plugins
+				// Allow this to be short-circuted in mu-plugins.
 				if ( ! apply_filters( 'wpcom_coauthors_show_enterprise_notice', true ) ) {
 					return;
 				}
@@ -51,8 +57,8 @@ if ( function_exists( 'Enterprise' ) ) {
  * We want to let Elasticsearch know that it should search the author taxonomy's name as a search field
  * See: https://elasticsearchp2.wordpress.com/2015/01/08/in-36757-z-vanguard-says-they/
  *
- * @param $es_wp_query_args The ElasticSearch Query Parameters
- * @param $query
+ * @param array    $es_wp_query_args The ElasticSearch Query Parameters.
+ * @param WP_Query $query            WordPress query.
  *
  * @return mixed
  */
@@ -61,10 +67,10 @@ function co_author_plus_es_support( $es_wp_query_args, $query ) {
 		$es_wp_query_args['query_fields'] = array( 'title', 'content', 'author', 'tag', 'category' );
 	}
 
-	// Search CAP author names
+	// Search CAP author names.
 	$es_wp_query_args['query_fields'][] = 'taxonomy.author.name';
 
-	// Filter based on CAP names
+	// Filter based on CAP names.
 	if ( ! empty( $query->query['author'] ) ) {
 		$es_wp_query_args['terms']['author'] = 'cap-' . $query->query['author'];
 	}
@@ -79,8 +85,8 @@ add_filter( 'wpcom_elasticsearch_wp_query_args', 'co_author_plus_es_support', 10
  *
  * Creates an array of authors, that will be used later.
  *
- * @param $author WP_User the original author
- * @param $post_id
+ * @param string $author WP_User The original author. // TODO: is this a string?
+ * @param int $post_id The WordPress post.
  *
  * @return array of coauthors
  */
@@ -146,7 +152,7 @@ add_filter(
  */
 add_filter(
 	'wpcom_subscriber_email_author_byline_html', function( $author_byline, $post_id, $authors ) {
-		// Check if $authors is a valid array
+		// Check if $authors is a valid array.
 		if ( ! is_array( $authors ) ) {
 			$authors = array( $authors );
 		}
@@ -174,7 +180,7 @@ add_filter(
  */
 add_filter(
 	'wpcom_subscriber_email_meta', function( $meta, $post_id, $authors ) {
-		// Check if $authors is a valid array
+		// Check if $authors is a valid array.
 		if ( ! is_array( $authors ) ) {
 			$authors = array( $authors );
 		}
@@ -188,7 +194,7 @@ add_filter(
 			}
 		}
 
-		// Only the first entry of meta includes the author listing
+		// Only the first entry of meta includes the author listing.
 		$meta[0] = $author_meta;
 
 		return $meta;
@@ -201,11 +207,11 @@ add_filter(
  * @param $author
  * @param $post_id
  *
- * @returns string with the authors
+ * @return string Athor names.
  */
 add_filter(
 	'wpcom_subscriber_text_email_author', function( $author, $post_id ) {
-		// Check if $authors is a valid array
+		// Check if $authors is a valid array.
 		$authors = get_coauthors( $post_id );
 
 		$author_text = '';
@@ -229,21 +235,25 @@ add_filter(
  * also prevents execution in case the only coauthor is real author.
  *
  * This function is hooked only to oembed endpoint and it should stay that way
+ *
+ * @param string $link            Author URL.
+ * @param int    $author_id       Author ID.
+ * @param string $author_nicename Author nicename (username).
+ *
+ * @return string Author URL>
  */
-
 function wpcom_vip_cap_replace_author_link( $link, $author_id, $author_nicename ) {
 
-	// get coauthors and iterate to the first one
-	// in case there are no coauthors, the Iterator returns current author
+	// Get coauthors and iterate to the first one.
+	// If there are no coauthors, the iterator returns current author.
 	$i = new CoAuthorsIterator();
 	$i->iterate();
 
-	// check if the current $author_id and $author_nicename is not the same as the first coauthor
+	// Check if the current $author_id and $author_nicename is not the same as the first coauthor.
 	if ( $i->current_author->ID !== $author_id || $i->current_author->user_nicename !== $author_nicename ) {
 
-		// alter the author_url
+		// Alter the author_url.
 		$link = get_author_posts_url( $i->current_author->ID, $i->current_author->user_nicename );
-
 	}
 
 	return $link;
@@ -251,7 +261,7 @@ function wpcom_vip_cap_replace_author_link( $link, $author_id, $author_nicename 
 
 add_action(
 	'init', function() {
-		// Hook the above callback only on oembed endpoint reply
+		// Hook the above callback only on oembed endpoint reply.
 		if ( true === defined( 'WPCOM_VIP_IS_OEMBED' ) && true === constant( 'WPCOM_VIP_IS_OEMBED' ) && true === apply_filters( 'wpcom_vip_coauthors_replace_oembed', false, 'author_url' ) ) {
 			add_filter( 'author_link', 'wpcom_vip_cap_replace_author_link', 99, 3 );
 		}
