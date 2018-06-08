@@ -22,6 +22,8 @@
 			"forum": "http://wordpress.org/support/plugin/co-authors-plus"
 	},
 	"require": {
-		"composer/installers": "~1.0"
+		"composer/installers": "~1.0",
+		"wp-coding-standards/wpcs": "^0.14.0",
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.4.4"
 	}
 }
