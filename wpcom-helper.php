@@ -18,10 +18,10 @@ function wpcom_vip_get_coauthors_plus_auto_apply_themes() {
 add_action(
 	'init', function() {
 		if ( in_array( get_option( 'template' ), wpcom_vip_get_coauthors_plus_auto_apply_themes() )
-		 || ( true === defined( 'WPCOM_VIP_IS_OEMBED' )
-			  && true === constant( 'WPCOM_VIP_IS_OEMBED' )
-			  && true === apply_filters( 'wpcom_vip_coauthors_replace_oembed', false, 'author_name' )
-		 ) ) {
+			|| ( true === defined( 'WPCOM_VIP_IS_OEMBED' )
+			&& true === constant( 'WPCOM_VIP_IS_OEMBED' )
+			&& true === apply_filters( 'wpcom_vip_coauthors_replace_oembed', false, 'author_name' )
+		) ) {
 			add_filter( 'coauthors_auto_apply_template_tags', '__return_true' );
 		}
 	}, 9
