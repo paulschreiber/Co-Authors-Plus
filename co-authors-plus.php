@@ -1288,7 +1288,7 @@ class CoAuthors_Plus {
 			'author_name' => wp_get_current_user()->user_nicename,
 		);
 		if ( 'post' != get_post_type() ) {
-			$mine_args['post_type'] = get_post_type();
+			$mine_args['post_type'] = get_current_screen()->post_type;
 		}
 		if ( ! empty( $_REQUEST['author_name'] ) && wp_get_current_user()->user_nicename == $_REQUEST['author_name'] ) {
 			$class = ' class="current"';
@@ -1603,14 +1603,24 @@ class CoAuthors_Plus {
 
 	/**
 	 * Filter of the header of author archive pages to correctly display author.
+	 *
+	 * @param $title string Archive Page Title
+	 *
+	 * @return string Archive Page Title
 	 */
-	public function filter_author_archive_title() {
-		if ( is_author() ) {
-			$author_slug = sanitize_user( get_query_var( 'author_name' ) );
-			$author      = $this->get_coauthor_by( 'user_nicename', $author_slug );
-			return sprintf( __( 'Author: %s' ), $author->display_name );
+	public function filter_author_archive_title( $title ) {
+		
+		// Bail if not an author archive template
+		if ( ! is_author() ) {
+			return $title;
 		}
+		
+		$author_slug = sanitize_user( get_query_var( 'author_name' ) );
+		$author = $this->get_coauthor_by( 'user_nicename', $author_slug );
+		
+		return sprintf( __( 'Author: %s' ), $author->display_name );
 	}
+
 }
 
 global $coauthors_plus;
